@@ -1,0 +1,132 @@
+function ec {
+    echo "test" $1
+}
+
+#-----------------------------------------------------------
+#    trello
+#----------------------------------------------------------
+function tsk
+{
+#local BRD_EMAIL=ayoubn@ms.com
+local BRD_EMAIL=ayoubnaciri+noaztwp2ylktfrd4ssfb@boards.trello.com
+  if [ $# -lt 1 ]; then
+    echo "e.g: tsk title desc."
+    return 1
+  fi       
+  echo "${2}" | mutt -s "${1}" -c ayoubn@ms.com ${BRD_EMAIL}
+}
+
+
+#-----------------------------------------------------------
+#   one-liners
+#----------------------------------------------------------
+function fixme_distxtic {
+  if [ $# -lt 1 ]; then
+    echo "e.g: distxtic spire-prod-ny " >&2
+    return 1
+  fi       
+  /ms/dist/crossasset/PROJ/xti/spire-prod-ny/bin/run_xtic.sh --rel spire-prod-ny
+}s
+
+
+
+#-----------------------------------------------------------
+#missing marks
+
+function missingmarks {
+  ssh $host_nyprod grep 'missing mark' $wkdir_nyprod/statemon/* |  sed 's/.* missing mark for \(.*\)/\1/' | sort | uniq
+}
+
+#-----------------------------------------------------------
+
+
+
+#-----------------------------------------------------------
+#    
+#----------------------------------------------------------
+function gdbcore {
+  if [ $# -lt 2 ]; then
+    echo "usage: gdb <path-to-bin> <path-to-core>" >&2
+    return 1
+  fi
+}
+
+#-----------------------------------------------------------
+#    spirehosts <plant>                       from rodolfo
+#----------------------------------------------------------
+function spirehosts {
+  local plant="$1"; shift
+  [ -z "$plant" ] && return 1
+  grep -h Zapplet "$zapp/ZappCfg/plane_${plant}.pm" |
+    sed -e '/^ *#/d' \
+        -e "s/^.*('\([^']*\)', *'\([^']*\)'.*$/\1\n\2/" |
+    sort -u
+}
+
+
+#----------------------------------------------------------
+function pfinfo {
+  local pf="$1"
+  ~/src/crossasset/xti/dev/src/tools/scripts/gen_pfinfo.sh --pf "$pf" --trend_books "$pf"  --axis_books "$pf" --zcs_books "$pf" | sort
+}
+
+
+
+# normalize PWD because of home mounted on nfs
+function norm {
+  local normhome=/v/global/user/a/ay/ayoubn
+  for denorm in /a/nyn104f1/vol/nyn104f1v4/u_t1343140122/ayoubn
+  do
+    if pwd | grep $denorm; then
+      cd $(echo $PWD | sed "s@${denorm}@${normhome}@")
+      return
+    fi
+  done
+}
+
+
+#-----------------------------------------------------------
+#    gtest
+#----------------------------------------------------------
+function gtest
+{
+/v/global/user/a/ay/ayoubn/src/ayoubdev/install/.exec/x86_64.linux.2.6.glibc.2.12/bin/testDriver-"${1}"-g --gtest_filter=*"${2}"*
+find . -type f -name *."${1}" | xargs grep "${2}"
+}
+
+#-----------------------------------------------------------
+#   tmuxshare
+#----------------------------------------------------------
+function tmuxshare
+{
+  tmux -2 -u -S /tmp/shared
+  chmod 777 /tmp/shared
+}
+
+
+#-----------------------------------------------------------
+#    grep files with this extension
+#----------------------------------------------------------
+function gxt
+{
+find . -type f -name *."${1}" | xargs grep "${2}" -n
+}
+
+
+function gxti()
+{
+find . -type f -name *."${1}" | xargs grep -i "${2}"
+}
+
+function gxtl()
+{
+find . -type f -name *."${1}" | xargs grep -l "${2}"
+}
+
+#-----------------------------------------------------------
+#    grep xmllint output
+#----------------------------------------------------------
+function xmlgrep()
+{
+xmllint --format "{1}" | grep -i "${2}"
+}
